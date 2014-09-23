@@ -1,8 +1,36 @@
 var http = require('http');
+var fs = require('fs');
 
 http.createServer(function (request, response) {
-  response.writeHead(200, {'Content-Type': 'text/plain'});
-  response.end('Hello World\n');
+  var url = request.url;
+  switch(url){
+  	case '/':
+  		getStaticFileContent(response,'/Users/Rob/documents/oceanzero/dev-history/example.html','text/html');
+  		break;
+  	case '/about':
+  		getStaticFileContent(response,'/Users/Rob/documents/oceanzero/dev-history/about.html','text/html');
+  		break;
+  	case '/contact':
+  		getStaticFileContent(response,'/Users/Rob/documents/oceanzero/dev-history/contact.html','text/html');
+  		break;
+  	default:
+  		response.writeHead(404, {'Content-Type':'text/plain'});
+  		response.end('404 - Page Not Found.');
+  		break;
+	}
 }).listen(8124);
 
 console.log('Server running at http://127.0.0.1:8124/');
+
+function getStaticFileContent(response, filepath, contentType){
+	fs.readFile(filepath, function(error, data){
+		if(error){
+			response.writeHead(500,{'Content-Type':'text/plain'});
+			response.end('500 - Internal Server Error.');
+		}
+		if(data){
+			response.writeHead(200,{'Content-Type':'text/html'});
+			response.end(data);
+		}
+	});
+}
